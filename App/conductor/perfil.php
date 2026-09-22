@@ -3,7 +3,7 @@ require_once __DIR__.'/../../Config/bootstrap.php';
 require_once __DIR__.'/../../Config/vista.php';
 $u=exigirAcceso(['admin','secretaria','conductor']);
 $iniciales=mb_strtoupper(mb_substr(trim($u['nombres']),0,1).mb_substr(trim($u['apellidos']),0,1));
-cabecera('Mi perfil',$u,'',false);
+cabecera('Mi perfil',$u,'perfil',false);
 ?>
 <div class="profile-stack">
 <section class="panel profile-summary"><div class="profile-avatar" aria-hidden="true"><?= e($iniciales) ?></div><div class="profile-identity"><span class="profile-label">CUENTA ACTIVA</span><h2><?= e($u['nombres'].' '.$u['apellidos']) ?></h2><p class="muted">Cédula <?= e($u['cedula']) ?></p><span class="badge green"><?= e(ucfirst($u['rol'])) ?></span></div><a class="button secondary profile-back" href="/<?= e(obtenerRutaInicio($u['rol'])) ?>">← Volver al panel</a></section>

@@ -15,7 +15,6 @@ $columnas=array_filter($campos,fn($k)=>$k!=='password',ARRAY_FILTER_USE_KEY);
 $mapas=['conductor_id'=>array_column($opciones['conductores'],'nombre','id')];
 cabecera($titulos[$modulo],$u,$modulo);
 ?>
-<p class="muted" style="margin:-12px 0 24px"><?= match($modulo){'usuarios'=>'Acceso por rol: administrador, secretaría y conductor.','buses'=>'Asigna un conductor fijo a cada unidad.','rutas'=>'Administra las rutas disponibles para iniciar un recorrido.'} ?></p>
 <section class="panel"><div class="toolbar filters"><div class="filter-controls"><input id="buscar" type="search" placeholder="Buscar en <?= e(strtolower($titulos[$modulo])) ?>…" aria-label="Buscar">
 <?php if($modulo==='usuarios'): ?><select id="filtroRol" aria-label="Filtrar por rol"><option value="">Todos los roles</option><option value="admin">Administrador</option><option value="secretaria">Secretaría</option><option value="conductor">Conductor</option></select><?php endif ?>
 <?php if($modulo==='buses'): ?><select id="filtroAsignacion" aria-label="Filtrar por asignación"><option value="">Todos los buses</option><option value="1">Con conductor</option><option value="0">Sin conductor</option></select><?php endif ?>

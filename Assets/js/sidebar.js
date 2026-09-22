@@ -36,7 +36,15 @@
         sync();
         toggle.focus();
     }
-    close.addEventListener('click', closeMobile);
+    close.addEventListener('click', () => {
+        if (mobile.matches) closeMobile();
+        else {
+            collapsed = true;
+            try { localStorage.setItem(storageKey, '1'); } catch (_) {}
+            sync();
+            toggle.focus();
+        }
+    });
     backdrop.addEventListener('click', closeMobile);
     sidebar.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
         if (mobile.matches) document.body.classList.remove('sidebar-open');
