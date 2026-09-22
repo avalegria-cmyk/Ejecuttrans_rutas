@@ -3,12 +3,23 @@ final class CatalogoDao {
     public const TABLAS=['usuarios'=>'usuario','buses'=>'bus','rutas'=>'ruta'];
     public function __construct(private PDO $db) {}
     public function listar(string $modulo): array {
+        if ($modulo==='buses') return $this->db->query("SELECT b.*, CONCAT(u.nombres,' ',u.apellidos) AS conductor_nombre FROM bus b LEFT JOIN usuario u ON u.id=b.conductor_id ORDER BY b.id DESC")->fetchAll();
         $tabla=self::TABLAS[$modulo];
         $columnas=$modulo==='usuarios' ? 'id,cedula,nombres,apellidos,rol,activo' : '*';
         return $this->db->query("SELECT $columnas FROM $tabla ORDER BY id DESC")->fetchAll();
     }
     public function opciones(): array {
         return ['conductores'=>$this->db->query("SELECT id,CONCAT(nombres,' ',apellidos) AS nombre FROM usuario WHERE activo=1 AND rol='conductor' ORDER BY nombres")->fetchAll()];
+    }
+    public function buscarConductores(string $texto, int $busId): array {
+        $patron='%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $texto).'%';
+        $s=$this->db->prepare("SELECT u.id, CONCAT(u.nombres,' ',u.apellidos) AS nombre, u.cedula
+            FROM usuario u WHERE u.activo=1 AND u.rol='conductor'
+            AND (CONCAT(u.nombres,' ',u.apellidos) LIKE ? ESCAPE '!' OR u.cedula LIKE ? ESCAPE '!')
+            AND NOT EXISTS (SELECT 1 FROM bus b WHERE b.conductor_id=u.id AND b.id<>?)
+            ORDER BY u.nombres,u.apellidos,u.id LIMIT 20");
+        $s->execute([$patron,$patron,$busId]);
+        return $s->fetchAll();
     }
     private function texto(string $key,int $max,bool $obligatorio=true): string {
         $v=$_POST[$key] ?? '';

@@ -14,7 +14,7 @@ function iconoMenu(string $nombre): string {
 }
 function cabecera(string $titulo, array $u, string $modulo='', bool $mostrarSalida=true): void { ?>
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= e($titulo) ?> · Ejecuttrans</title><link rel="icon" href="/Assets/icons/icon-192x192.png"><link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#2563eb"><script src="https://cdn.tailwindcss.com"></script><script>tailwind.config={corePlugins:{preflight:false}};</script><link rel="stylesheet" href="/Assets/css/app.css"><link rel="stylesheet" href="/Assets/css/layout.css"></head>
-<body><div class="shell <?= $u['rol']==='conductor' ? 'driver-shell' : 'admin-shell' ?>">
+<body><div class="shell <?= $modulo==='perfil'?'profile-page':'' ?> <?= $u['rol']==='conductor' ? 'driver-shell' : 'admin-shell' ?>">
 <?php if ($u['rol']!=='conductor'): ?>
 <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
     <div class="sidebar-head"><a class="brand" href="/Web/admin/dashboard.php"><img src="/Assets/icons/icon-192x192.png" alt=""><span>EJECUTTRANS</span></a><button type="button" class="sidebar-close" id="sidebarClose" aria-label="Ocultar menú"><span aria-hidden="true">‹</span></button></div>

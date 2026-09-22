@@ -13,9 +13,10 @@ docker compose up -d --build
 - MySQL y evidencias persisten en los volúmenes de este proyecto: `sistema_recorridos_recorridos_db` y `sistema_recorridos_evidencias`.
 - Los contenedores y volúmenes del sistema anterior no se modifican.
 - Esta instalación se construyó aprovechando la imagen PHP 8.3.33 local con `docker compose build --build-arg PHP_BASE=sistema_minutos-web:latest web`. La construcción predeterminada usa la imagen oficial `php:8.3.33-apache`.
-- `database/schema.sql` se ejecuta al crear el volumen de MySQL por primera vez. La versión pública define las tablas y rutas de ejemplo, pero no publica usuarios ni buses reales.
+- `database/schema.sql` reúne la creación de `sistema_recorridos`, sus tablas, las rutas de ejemplo y la carga inicial de 7 usuarios y 88 buses del respaldo de Minutos del 22/09/2026. Se ejecuta automáticamente al inicializar MySQL con un volumen vacío, o puede importarse completo manualmente para una instalación nueva. No elimina bases existentes ni actualiza una instalación que ya tenga las tablas.
+- Los 2 administradores y la cuenta de secretaría conservan sus roles; los otros 4 usuarios quedan como conductores. Se mantienen los identificadores y estados. La clave inicial es la cédula, almacenada como hash bcrypt. Los buses quedan sin conductor fijo porque el respaldo no contiene asignaciones.
 
-Si agregas datos reales a tu copia local de `schema.sql`, no publiques ese archivo: contendrá cédulas, nombres y hashes de contraseña. `scripts/crear_demo.php` queda disponible solo para pruebas opcionales y puede agregar cuentas y una unidad de demostración. Las variables `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` se pueden definir en `.env` antes de inicializar la base.
+Esta copia local de `schema.sql` contiene cédulas, nombres y hashes de contraseña procedentes del respaldo de Minutos. `scripts/crear_demo.php` queda disponible solo para pruebas opcionales y puede agregar cuentas y una unidad de demostración. Las variables `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` se pueden definir en `.env` antes de inicializar la base.
 
 ## Uso y permisos
 

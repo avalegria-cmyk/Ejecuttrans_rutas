@@ -119,3 +119,30 @@ body.sidebar-collapsed .admin-shell .sidebar{display:none}
   .admin-shell .sidebar-head{min-height:80px}
 }
 @media(max-width:380px){.admin-shell .date{display:inline;white-space:nowrap}.admin-shell .page-heading{flex-wrap:wrap}}
+
+/* Edición de buses y búsqueda remota de conductores. */
+td .editar-bus{padding:8px 12px;font-size:12px;font-weight:700;background:#fefce8;color:#a16207;border:1px solid #fef08a;border-radius:8px;transition:background .15s,color .15s}
+td .editar-bus:hover{background:#ca8a04;color:#fff;filter:none}
+.editar-bus:focus-visible{outline:3px solid #fef08a;outline-offset:2px}
+.conductor-search{position:relative}
+.conductor-search-controls{display:flex;align-items:center;gap:8px}
+.conductor-search-controls input{min-width:0;flex:1}
+.conductor-search-controls button{padding:10px;font-size:12px}
+.conductor-results{list-style:none;padding:4px;margin:6px 0 0;max-height:210px;overflow-y:auto;background:#fff;border:1px solid #cfd9e6;border-radius:8px}
+.conductor-results[hidden]{display:none}
+.conductor-results li{padding:10px;cursor:pointer;border-radius:5px;font-size:13px;overflow-wrap:anywhere}
+.conductor-results li:hover,.conductor-results li[aria-selected="true"]{background:#eff6ff;color:#1d4ed8}
+.conductor-search .hint{margin:6px 0 0}
+.conductor-search .hint:empty{display:none}
+
+/* Usuarios y buses: 20 registros por página, conservando los filtros. */
+.catalog-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid #e0e7ef}
+.catalog-pagination p{margin:0;font-size:13px;color:#70829a}
+.catalog-pagination-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.catalog-pagination-controls button{padding:8px 12px;font-size:13px}
+.catalog-pagination-controls span{padding:8px 12px;background:#2563eb;color:#fff;border-radius:8px;font-size:13px;font-weight:600}
+.catalog-pagination-controls button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+#registros tr[hidden]{display:none!important}
+
+/* Tarjetas del perfil centradas, conservando su distribución interior. */
+.profile-page .profile-stack{width:100%;margin-inline:auto}
