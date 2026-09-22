@@ -7,6 +7,5 @@ foreach($usuarios as [$cedula,$nombres,$apellidos,$rol]) {
  $s=$conexion->prepare('INSERT IGNORE INTO usuario(cedula,nombres,apellidos,rol,password_hash) VALUES (?,?,?,?,?)');
  $s->execute([$cedula,$nombres,$apellidos,$rol,password_hash($cedula,PASSWORD_DEFAULT)]);
 }
-$conexion->exec("INSERT IGNORE INTO socio(cedula,nombres,telefono) VALUES ('1710034065','Socio de ejemplo','')");
-$conexion->exec("INSERT IGNORE INTO bus(disco,placa,socio_id,conductor_id) SELECT '001','DEMO-001',s.id,u.id FROM socio s CROSS JOIN usuario u WHERE s.cedula='1710034065' AND u.cedula='0102030400'");
+$conexion->exec("INSERT IGNORE INTO bus(disco,placa,conductor_id) SELECT '001','DEMO-001',u.id FROM usuario u WHERE u.cedula='0102030400'");
 echo "Usuarios creados. La contraseña de cada usuario es su propia cédula.\n";

@@ -1,6 +1,6 @@
 <?php
 final class CatalogoDao {
-    public const TABLAS=['usuarios'=>'usuario','socios'=>'socio','buses'=>'bus','rutas'=>'ruta'];
+    public const TABLAS=['usuarios'=>'usuario','buses'=>'bus','rutas'=>'ruta'];
     public function __construct(private PDO $db) {}
     public function listar(string $modulo): array {
         $tabla=self::TABLAS[$modulo];
@@ -8,10 +8,7 @@ final class CatalogoDao {
         return $this->db->query("SELECT $columnas FROM $tabla ORDER BY id DESC")->fetchAll();
     }
     public function opciones(): array {
-        return [
-            'socios'=>$this->db->query('SELECT id,nombres AS nombre FROM socio WHERE activo=1 ORDER BY nombres')->fetchAll(),
-            'conductores'=>$this->db->query("SELECT id,CONCAT(nombres,' ',apellidos) AS nombre FROM usuario WHERE activo=1 AND rol='conductor' ORDER BY nombres")->fetchAll()
-        ];
+        return ['conductores'=>$this->db->query("SELECT id,CONCAT(nombres,' ',apellidos) AS nombre FROM usuario WHERE activo=1 AND rol='conductor' ORDER BY nombres")->fetchAll()];
     }
     private function texto(string $key,int $max,bool $obligatorio=true): string {
         $v=$_POST[$key] ?? '';
@@ -49,14 +46,10 @@ final class CatalogoDao {
                     if (strlen($clave)<8) throw new DomainException('La contraseña debe tener al menos 8 caracteres.');
                     $data['password_hash']=password_hash($clave,PASSWORD_DEFAULT);
                 }
-            } elseif ($modulo==='socios') {
-                $cedula=$this->texto('cedula',10);
-                if (!validarCedulaEcuatoriana($cedula)) throw new DomainException('Ingresa una cédula ecuatoriana válida.');
-                $data=['cedula'=>$cedula,'nombres'=>$this->texto('nombres',150),'telefono'=>$this->texto('telefono',25,false),'activo'=>$activo];
             } elseif ($modulo==='rutas') {
                 $data=['nombre'=>$this->texto('nombre',120),'descripcion'=>$this->texto('descripcion',500,false),'activo'=>$activo];
             } else {
-                $conductor=(int)($_POST['conductor_id'] ?? 0) ?: null; $socio=(int)($_POST['socio_id'] ?? 0) ?: null;
+                $conductor=(int)($_POST['conductor_id'] ?? 0) ?: null;
                 if ($id) {
                     $s=$this->db->prepare('SELECT id FROM recorrido WHERE bus_activo=?'); $s->execute([$id]);
                     if ($s->fetch()) throw new DomainException('No se puede modificar un bus con un recorrido activo.');
@@ -65,14 +58,10 @@ final class CatalogoDao {
                     $s=$this->db->prepare("SELECT id FROM usuario WHERE id=? AND activo=1 AND rol='conductor' FOR UPDATE"); $s->execute([$conductor]);
                     if (!$s->fetch()) throw new DomainException('Selecciona un conductor habilitado.');
                 }
-                if ($socio) {
-                    $s=$this->db->prepare('SELECT id FROM socio WHERE id=? AND activo=1'); $s->execute([$socio]);
-                    if (!$s->fetch() && (!$actual || (int)$actual['socio_id']!==$socio)) throw new DomainException('Selecciona un socio habilitado.');
-                }
                 $disco=$this->texto('disco',20);
                 if (!ctype_digit($disco)) throw new DomainException('El disco debe contener solo números.');
                 $disco=str_pad(ltrim($disco,'0') ?: '0',3,'0',STR_PAD_LEFT);
-                $data=['disco'=>$disco,'placa'=>strtoupper($this->texto('placa',20,false)) ?: null,'socio_id'=>$socio,'conductor_id'=>$conductor,'activo'=>$activo];
+                $data=['disco'=>$disco,'placa'=>strtoupper($this->texto('placa',20,false)) ?: null,'conductor_id'=>$conductor,'activo'=>$activo];
             }
             if ($id) {
                 $campos=implode(',',array_map(fn($k)=>"$k=?",array_keys($data))); $valores=array_values($data); $valores[]=$id;

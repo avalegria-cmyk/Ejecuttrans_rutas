@@ -44,7 +44,7 @@ class Client:
         status,body,_=self.get(path);assert status==200,(path,status)
         return re.search(r'name="csrf" value="([a-f0-9]+)"',body.decode()).group(1)
 
-ids=[];ruta_id=None;bus_id=None;socio_id=None
+ids=[];ruta_id=None;bus_id=None
 try:
     cs=[cedula('09'+str(int(uuid.uuid4().hex[:8],16)%10000000).zfill(7)) for _ in range(4)]
     # Tercer dígito debe ser menor a 6.
@@ -56,9 +56,19 @@ try:
     token=admin.token('/Web/admin/usuarios.php')
     stoken=secretaria.token('/Web/admin/rutas.php')
     dtoken=driver.token('/App/conductor/dashboard.php')
-    for path in ['/Web/admin/usuarios.php','/Web/admin/buses.php','/Web/admin/socios.php','/Web/admin/rutas.php','/Web/admin/dashboard.php']:
+    for path in ['/Web/admin/usuarios.php','/Web/admin/buses.php','/Web/admin/rutas.php','/Web/admin/dashboard.php']:
         assert driver.get(path)[0]==403,path
         assert admin.get(path)[0]==200,path
+    assert admin.get('/Web/admin/socios.php')[0]==404
+    usuarios_html=admin.get('/Web/admin/usuarios.php')[1].decode()
+    buses_html=admin.get('/Web/admin/buses.php')[1].decode()
+    rutas_html=admin.get('/Web/admin/rutas.php')[1].decode()
+    recorridos_html=admin.get('/Web/admin/dashboard.php')[1].decode()
+    assert 'id="filtroRol"' in usuarios_html and 'id="filtroEstado"' in usuarios_html
+    assert 'id="filtroAsignacion"' in buses_html and 'socio_id' not in buses_html
+    assert 'id="filtroEstado"' in rutas_html
+    assert all(f'id="{campo}"' in recorridos_html for campo in ['estado','ruta','disco','desde','hasta'])
+    assert '>Socios<' not in usuarios_html
     assert secretaria.get('/Web/admin/usuarios.php')[0]==403
     assert secretaria.get('/App/conductor/dashboard.php')[0]==403
     assert secretaria.post('/Controllers/CatalogoController.php',{'csrf':stoken,'modulo':'usuarios'})[0]==403
@@ -80,10 +90,8 @@ try:
     assert secretaria.get('/Controllers/RutaController.php')[0]==403
     assert driver.get('/Controllers/RutaController.php?q[]=x')[0]==422
     print('OK: búsqueda AJAX limitada a 5 rutas habilitadas')
-    status,data=save(admin,token,'socios',cedula=cs[0],nombres=TAG,telefono='');assert status==200,data
-    socio_id=php('$s=$conexion->prepare("SELECT id FROM socio WHERE nombres=?");$s->execute(["'+TAG+'"]);echo json_encode((int)$s->fetchColumn());')
     disco=str(int(uuid.uuid4().hex[:8],16))
-    status,data=save(secretaria,stoken,'buses',disco=disco,placa=TAG,socio_id=socio_id,conductor_id=ids[2]);assert status==200,data
+    status,data=save(secretaria,stoken,'buses',disco=disco,placa=TAG,conductor_id=ids[2]);assert status==200,data
     bus_id=php('$s=$conexion->prepare("SELECT id FROM bus WHERE placa=?");$s->execute(["'+TAG+'"]);echo json_encode((int)$s->fetchColumn());')
     image=('foto.png','image/png',Path('Assets/icons/icon-512x512.png').read_bytes())
     fields={'csrf':dtoken,'accion':'iniciar','ruta_id':ruta_id,'kilometraje':'10000'}
@@ -106,7 +114,7 @@ try:
     assert driver.get('/Controllers/EvidenciaController.php?id='+str(rid))[0]==200
     assert other.get('/Controllers/EvidenciaController.php?id='+str(rid))[0]==404
     assert admin.get('/Controllers/EvidenciaController.php?id='+str(rid))[2]['Content-Type']=='image/jpeg'
-    status,data=save(secretaria,stoken,'buses',id=bus_id,disco=disco,placa=TAG,socio_id=socio_id,conductor_id=ids[3]);assert status==422,data
+    status,data=save(secretaria,stoken,'buses',id=bus_id,disco=disco,placa=TAG,conductor_id=ids[3]);assert status==422,data
     print('OK: catálogos, evidencias, CSRF y exclusión de recorridos simultáneos')
     # El evento SSE debe contener el inicio, sin esperar al cierre de conexión.
     with admin.opener.open(BASE+'/Controllers/RecorridosStreamController.php',timeout=8) as stream:
@@ -130,7 +138,7 @@ try:
     status,data=save(secretaria,stoken,'rutas',id=ruta_id,nombre=TAG+' editada',descripcion='');assert status==200,data
     snapshot=php('$s=$conexion->prepare("SELECT ruta_nombre FROM recorrido WHERE id=?");$s->execute(['+str(rid)+']);echo json_encode($s->fetchColumn());')
     assert snapshot==TAG
-    status,data=save(secretaria,stoken,'buses',id=bus_id,disco=disco,placa=TAG,socio_id=socio_id,conductor_id=ids[3]);assert status==200,data
+    status,data=save(secretaria,stoken,'buses',id=bus_id,disco=disco,placa=TAG,conductor_id=ids[3]);assert status==200,data
     print('OK: SSE, cierre, kilometraje, PDF, historial y reasignación')
     print('TODAS LAS PRUEBAS PASARON')
 finally:
@@ -138,4 +146,4 @@ finally:
         # Eliminar exclusivamente filas y evidencias de esta ejecución.
         php('$s=$conexion->prepare("DELETE FROM ruta WHERE descripcion=?");$s->execute(["'+TAG+'"]);echo "true";')
         sqlids=','.join(map(str,ids))
-        php('$ids="'+sqlids+'";$files=$conexion->query("SELECT evidencia_inicial,evidencia_final FROM recorrido WHERE conductor_id IN ($ids)")->fetchAll();$conexion->exec("DELETE FROM recorrido WHERE conductor_id IN ($ids)");$conexion->exec("DELETE FROM bus WHERE conductor_id IN ($ids) OR placa=\''+TAG+'\'");$conexion->exec("DELETE FROM usuario WHERE id IN ($ids)");$conexion->exec("DELETE FROM socio WHERE nombres=\''+TAG+'\'");$conexion->exec("DELETE FROM ruta WHERE nombre IN (\''+TAG+'\',\''+TAG+' editada\')");foreach($files as $f)foreach([$f["evidencia_inicial"],$f["evidencia_final"]] as $file)if($file)@unlink("/var/www/html/storage/evidencias/".$file);echo "true";')
+        php('$ids="'+sqlids+'";$files=$conexion->query("SELECT evidencia_inicial,evidencia_final FROM recorrido WHERE conductor_id IN ($ids)")->fetchAll();$conexion->exec("DELETE FROM recorrido WHERE conductor_id IN ($ids)");$conexion->exec("DELETE FROM bus WHERE conductor_id IN ($ids) OR placa=\''+TAG+'\'");$conexion->exec("DELETE FROM usuario WHERE id IN ($ids)");$conexion->exec("DELETE FROM ruta WHERE nombre IN (\''+TAG+'\',\''+TAG+' editada\')");foreach($files as $f)foreach([$f["evidencia_inicial"],$f["evidencia_final"]] as $file)if($file)@unlink("/var/www/html/storage/evidencias/".$file);echo "true";')

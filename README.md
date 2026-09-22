@@ -28,16 +28,16 @@ El script es idempotente y no reemplaza contraseñas existentes. Incluye el disc
 
 ## Uso y permisos
 
-- Administrador: recorridos, buses, socios, rutas, usuarios y acceso a la vista de la app.
-- Secretaría: recorridos, buses, socios y rutas. Sin acceso a usuarios, incluso mediante llamadas directas al controlador.
+- Administrador: recorridos, buses, rutas, usuarios y acceso a la vista de la app.
+- Secretaría: recorridos, buses y rutas. Sin acceso a usuarios, incluso mediante llamadas directas al controlador.
 - Conductor: perfil, contraseña e inicio/finalización de su recorrido. Sin acceso a administración.
-- Socios es un directorio de propietarios, no un rol de acceso. Un socio puede tener varios buses. Cada bus puede tener un conductor fijo y cada conductor un solo bus asignado.
-- En Buses se asignan o cambian socio y conductor. Un bus con recorrido activo no puede editarse. Para trasladar un conductor, retíralo primero del bus anterior.
+- Cada bus puede tener un conductor fijo y cada conductor un solo bus asignado.
+- En Buses se asigna o cambia el conductor. Un bus con recorrido activo no puede editarse. Para trasladar un conductor, retíralo primero del bus anterior.
 - Los registros se deshabilitan, conservando las relaciones y el historial.
 
 La app conserva el menú de dos tarjetas del sistema de minutos, sin reloj. Para iniciar: confirmar la intención, buscar o seleccionar una ruta habilitada (AJAX, hasta 5 coincidencias), introducir kilometraje entero y adjuntar evidencia. Escribir filtra el catálogo; se debe seleccionar una coincidencia y no se crean rutas desde la app. Para finalizar: confirmar la intención e introducir kilometraje final y evidencia. Ambas tarjetas permanecen visibles: Iniciar ruta se deshabilita durante el recorrido y Finalizar ruta se habilita únicamente mientras existe un recorrido activo. Los botones dependen del estado persistido. La base también impide recorridos simultáneos para un mismo conductor o bus. El kilometraje final no puede ser menor al inicial; el nuevo inicial no puede ser menor al último final del bus.
 
-Las horas se registran en el servidor en UTC−5. Los nombres de conductor, ruta y disco se guardan en el recorrido para preservar el historial. Administración muestra los últimos 500 registros, permite filtrar y recibe cambios con Server-Sent Events; reconecta automáticamente. Los contadores corresponden a los registros filtrados.
+Las horas se registran en el servidor en UTC−5. Los nombres de conductor, ruta y disco se guardan en el recorrido para preservar el historial. Los módulos administrativos incluyen búsqueda y filtros combinables. Recorridos muestra los últimos 500 registros, permite filtrar por estado, ruta, disco y fechas, y recibe cambios con Server-Sent Events; reconecta automáticamente. Los contadores corresponden a los registros filtrados.
 
 Las evidencias aceptan JPG, PNG, WEBP o PDF de hasta 10 MB. Las imágenes se reducen a 1600 píxeles y se guardan como JPEG; los PDF se conservan. Los archivos se sirven exclusivamente desde un controlador con autorización. Las imágenes de más de 24 megapíxeles se rechazan en el servidor para limitar memoria.
 
