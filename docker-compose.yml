@@ -1,6 +1,7 @@
-name: sistema_recorridos
+name: sistema_rutas
 services:
   db:
+    container_name: sistema_rutas_db
     image: mysql:8.4
     command: --default-time-zone=-05:00
     environment:
@@ -17,6 +18,7 @@ services:
       timeout: 5s
       retries: 30
   web:
+    container_name: sistema_rutas_php
     build: .
     ports: ['127.0.0.1:8083:80']
     environment:
@@ -31,6 +33,7 @@ services:
       db:
         condition: service_healthy
   phpmyadmin:
+    container_name: sistema_rutas_pma
     image: phpmyadmin@sha256:3a8a8d6b5289091f959ba0293f21163b3a2fc5741991a53de70b3497fe8d31db
     ports: ['127.0.0.1:8084:80']
     environment:
@@ -40,4 +43,8 @@ services:
         condition: service_healthy
 volumes:
   recorridos_db:
+    name: sistema_recorridos_recorridos_db
+    external: true
   evidencias:
+    name: sistema_recorridos_evidencias
+    external: true

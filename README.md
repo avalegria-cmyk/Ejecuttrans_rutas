@@ -11,12 +11,12 @@ docker compose exec web php scripts/crear_demo.php
 
 - Aplicación: http://localhost:8083
 - phpMyAdmin: http://localhost:8084 (servidor `db`, usuario `recorridos`, contraseña local `recorridos.local.2026`).
-- MySQL y evidencias persisten en volúmenes nuevos: `sistema_recorridos_recorridos_db` y `sistema_recorridos_evidencias`.
+- MySQL y evidencias persisten en los volúmenes de este proyecto: `sistema_recorridos_recorridos_db` y `sistema_recorridos_evidencias`.
 - Los contenedores y volúmenes del sistema anterior no se modifican.
 - Esta instalación se construyó aprovechando la imagen PHP 8.3.33 local con `docker compose build --build-arg PHP_BASE=sistema_minutos-web:latest web`. La construcción predeterminada usa la imagen oficial `php:8.3.33-apache`.
 - `database/schema.sql` se ejecuta al crear el volumen de MySQL por primera vez.
 
-Usuarios ficticios para desarrollo, creados solo al ejecutar `crear_demo.php`. Contraseña para los tres: `Demo.2026*`.
+Las cuentas iniciales son `1710034065` (administrador), `0926687856` (secretaría) y `0102030400` (conductor). Cada contraseña es la misma cédula. `crear_demo.php` es idempotente y deja estas cuentas habilitadas sin reemplazar otras cuentas.
 
 | Rol | Cédula |
 | --- | --- |
