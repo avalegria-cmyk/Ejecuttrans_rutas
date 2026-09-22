@@ -1,0 +1,43 @@
+name: sistema_recorridos
+services:
+  db:
+    image: mysql:8.4
+    command: --default-time-zone=-05:00
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root.recorridos.local.2026}
+      MYSQL_DATABASE: sistema_recorridos
+      MYSQL_USER: recorridos
+      MYSQL_PASSWORD: ${DB_PASSWORD:-recorridos.local.2026}
+    volumes:
+      - recorridos_db:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'mysqladmin ping -h localhost -uroot -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  web:
+    build: .
+    ports: ['127.0.0.1:8083:80']
+    environment:
+      DB_HOST: db
+      DB_NAME: sistema_recorridos
+      DB_USER: recorridos
+      DB_PASSWORD: ${DB_PASSWORD:-recorridos.local.2026}
+    volumes:
+      - .:/var/www/html
+      - evidencias:/var/www/html/storage/evidencias
+    depends_on:
+      db:
+        condition: service_healthy
+  phpmyadmin:
+    image: phpmyadmin@sha256:3a8a8d6b5289091f959ba0293f21163b3a2fc5741991a53de70b3497fe8d31db
+    ports: ['127.0.0.1:8084:80']
+    environment:
+      PMA_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  recorridos_db:
+  evidencias:

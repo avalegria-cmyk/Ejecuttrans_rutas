@@ -1,0 +1,65 @@
+// Assets/js/auth.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const alertaError = document.getElementById('alertaError');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const inputCedula = document.getElementById('cedula');
+    const inputPassword = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePasswordLogin');
+
+    togglePassword?.addEventListener('click', () => {
+        const mostrar = inputPassword.type === 'password';
+        inputPassword.type = mostrar ? 'text' : 'password';
+        togglePassword.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+        togglePassword.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        togglePassword.querySelector('[data-icono-mostrar]')?.classList.toggle('hidden', mostrar);
+        togglePassword.querySelector('[data-icono-ocultar]')?.classList.toggle('hidden', !mostrar);
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita que la página se recargue
+
+        if (!window.CedulaEcuador.validarCampo(inputCedula, true) || !loginForm.reportValidity()) {
+            return;
+        }
+
+        // Ocultar alerta y cambiar texto del botón
+        alertaError.classList.add('hidden');
+        btnSubmit.textContent = 'Validando...';
+        btnSubmit.disabled = true;
+
+        // Recolectar datos del formulario
+        const formData = new FormData(loginForm);
+
+        try {
+            // Enviar petición POST al controlador
+            const response = await fetch('Controllers/AuthController.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                // Redirigir según el rol
+                window.location.href = data.redirect;
+            } else if (data.status === 'require_change') {
+                // Redirigir a pantalla de cambio de clave
+                window.location.href = data.redirect;
+            } else {
+                // Mostrar error (ej: credenciales incorrectas)
+                alertaError.textContent = data.message;
+                alertaError.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error en la petición AJAX:', error);
+            alertaError.textContent = 'Error de conexión con el servidor.';
+            alertaError.classList.remove('hidden');
+        } finally {
+            // Restaurar el botón
+            btnSubmit.textContent = 'Ingresar';
+            btnSubmit.disabled = false;
+        }
+    });
+});
