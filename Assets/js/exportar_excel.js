@@ -3,12 +3,13 @@
     if (!boton) return;
     const estado=document.getElementById('estadoExportacion');
     const texto=elemento=>elemento?.textContent.trim() || '';
-    function exportarTabla() {
+    function exportarTabla(modulo) {
         const tabla=document.querySelector('main table');
         if (!tabla) throw new Error('No hay una tabla disponible para exportar.');
         const columnas=[...tabla.querySelectorAll('thead th')]
             .map((celda,indice)=>({indice,titulo:texto(celda)}))
-            .filter(columna=>columna.titulo.toLocaleLowerCase('es')!=='acciones');
+            .filter(columna=>columna.titulo.toLocaleLowerCase('es')!=='acciones'
+                && !(modulo==='recorridos' && /^evidencia(?:\s|$)/i.test(columna.titulo)));
         const filas=[...tabla.querySelectorAll('tbody tr')].filter(fila=>
             !fila.querySelector('td[colspan]') && (fila.dataset.coincideFiltro!==undefined
                 ? fila.dataset.coincideFiltro==='true' : !fila.hidden)
@@ -53,7 +54,7 @@
         estado.textContent='Preparando Excel…';
         try {
             const modulo=boton.dataset.modulo;
-            const datos=modulo==='dashboard'?exportarDashboard():modulo==='perfil'?exportarPerfil():exportarTabla();
+            const datos=modulo==='dashboard'?exportarDashboard():modulo==='perfil'?exportarPerfil():exportarTabla(modulo);
             const formulario=new FormData();
             formulario.set('csrf',boton.dataset.csrf);
             formulario.set('modulo',modulo);

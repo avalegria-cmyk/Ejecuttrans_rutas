@@ -19,5 +19,11 @@ try {
         if (!is_array($fila) || !array_is_list($fila) || count($fila)!==count($encabezados)) throw new DomainException('Fila inválida.');
         foreach ($fila as $valor) if ((!is_string($valor) && !is_int($valor) && !is_float($valor) && $valor!==null) || (is_string($valor) && mb_strlen($valor)>32767)) throw new DomainException('Celda inválida.');
     }
+    if ($modulo==='recorridos') {
+        $columnas=array_keys(array_filter($encabezados, static fn($titulo)=>!preg_match('/^evidencia(?:\s|$)/iu',trim($titulo))));
+        if (!$columnas) throw new DomainException('No hay columnas para exportar.');
+        $encabezados=array_map(static fn($i)=>$encabezados[$i],$columnas);
+        $filas=array_map(static fn($fila)=>array_map(static fn($i)=>$fila[$i],$columnas),$filas);
+    }
     descargarExcel($modulo,$encabezados,$filas);
 } catch (Throwable $e) { fallo($e); }
