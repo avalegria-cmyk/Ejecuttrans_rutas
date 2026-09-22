@@ -31,7 +31,7 @@ CREATE TABLE recorrido (
  conductor_activo INT GENERATED ALWAYS AS (IF(fin IS NULL, conductor_id, NULL)) STORED UNIQUE,
  bus_activo INT GENERATED ALWAYS AS (IF(fin IS NULL, bus_id, NULL)) STORED UNIQUE,
  FOREIGN KEY (conductor_id) REFERENCES usuario(id), FOREIGN KEY (bus_id) REFERENCES bus(id), FOREIGN KEY (ruta_id) REFERENCES ruta(id),
- CONSTRAINT kilometraje_valido CHECK (km_final IS NULL OR km_final >= km_inicial),
+ CONSTRAINT kilometraje_valido CHECK (km_final IS NULL OR km_final > km_inicial),
  CONSTRAINT cierre_completo CHECK ((fin IS NULL AND km_final IS NULL AND evidencia_final IS NULL) OR (fin IS NOT NULL AND km_final IS NOT NULL AND evidencia_final IS NOT NULL)),
  INDEX (inicio), INDEX (conductor_id, inicio)
 ) ENGINE=InnoDB;

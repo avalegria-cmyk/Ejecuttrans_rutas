@@ -25,7 +25,9 @@ function aplicarFiltros(reiniciarPagina=true){
         const coincideEstado=!estado || fila.dataset.activo===estado;
         const coincideRol=!rol || fila.dataset.rol===rol;
         const coincideAsignacion=!asignacion || fila.dataset.conductor===asignacion;
-        return coincideTexto && coincideEstado && coincideRol && coincideAsignacion;
+        const coincide=coincideTexto && coincideEstado && coincideRol && coincideAsignacion;
+        fila.dataset.coincideFiltro=String(coincide);
+        return coincide;
     });
     const total=filtradas.length;
     const totalPaginas=Math.max(1,Math.ceil(total/limiteCatalogo));
@@ -111,7 +113,7 @@ async function buscarConductores() {
         const datos=await respuesta.json();
         if (!respuesta.ok || datos.status!=='success') throw new Error(datos.message || 'No se pudo buscar conductores.');
         if (solicitud.signal.aborted || consultaConductor!==solicitud || !editor.open) return;
-        opcionesConductores=datos.conductores; indiceConductor=-1;
+        opcionesConductores=datos.conductores.slice(0,5); indiceConductor=-1;
         resultadosConductores.replaceChildren();
         campoConductor.removeAttribute('aria-activedescendant');
         opcionesConductores.forEach((conductor,indice)=>{
@@ -126,7 +128,7 @@ async function buscarConductores() {
         resultadosConductores.hidden=!opcionesConductores.length;
         campoConductor.setAttribute('aria-expanded',String(opcionesConductores.length>0));
         estadoConductores.textContent=opcionesConductores.length
-            ? 'Selecciona un conductor. Se muestran hasta 20 resultados.'
+            ? 'Selecciona un conductor. Se muestran hasta 5 coincidencias.'
             : 'No hay conductores disponibles que coincidan.';
     } catch(error) {
         if (solicitud.signal.aborted || consultaConductor!==solicitud) return;

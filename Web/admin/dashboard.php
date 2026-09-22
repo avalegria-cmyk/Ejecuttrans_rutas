@@ -10,7 +10,6 @@ cabecera('Dashboard',$u,'dashboard');
 <div class="overview-stats" aria-label="Indicadores de operación">
   <article class="overview-card accent-blue"><span>Recorridos de hoy</span><strong><?= e($datos['recorridos_hoy']) ?></strong><small><?= e($datos['finalizados_hoy']) ?> finalizados</small></article>
   <article class="overview-card accent-amber"><span>En curso ahora</span><strong><?= e($datos['en_curso']) ?></strong><small>Recorridos activos</small></article>
-  <article class="overview-card accent-green"><span>Kilómetros de hoy</span><strong><?= e(number_format($datos['km_hoy'],0,',','.')) ?></strong><small>De recorridos finalizados</small></article>
   <article class="overview-card accent-violet"><span>Buses habilitados</span><strong><?= e($datos['buses_activos']) ?></strong><small><?= e($datos['buses_asignados']) ?> con conductor asignado</small></article>
 </div>
 <div class="overview-grid">

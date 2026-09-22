@@ -17,7 +17,7 @@ final class CatalogoDao {
             FROM usuario u WHERE u.activo=1 AND u.rol='conductor'
             AND (CONCAT(u.nombres,' ',u.apellidos) LIKE ? ESCAPE '!' OR u.cedula LIKE ? ESCAPE '!')
             AND NOT EXISTS (SELECT 1 FROM bus b WHERE b.conductor_id=u.id AND b.id<>?)
-            ORDER BY u.nombres,u.apellidos,u.id LIMIT 20");
+            ORDER BY u.nombres,u.apellidos,u.id LIMIT 5");
         $s->execute([$patron,$patron,$busId]);
         return $s->fetchAll();
     }

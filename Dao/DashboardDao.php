@@ -11,7 +11,6 @@ final class DashboardDao {
             'recorridos_hoy'=>$this->numero('SELECT COUNT(*) FROM recorrido WHERE inicio >= CURDATE() AND inicio < CURDATE() + INTERVAL 1 DAY'),
             'finalizados_hoy'=>$this->numero('SELECT COUNT(*) FROM recorrido WHERE fin >= CURDATE() AND fin < CURDATE() + INTERVAL 1 DAY'),
             'en_curso'=>$this->numero('SELECT COUNT(*) FROM recorrido WHERE fin IS NULL'),
-            'km_hoy'=>$this->numero('SELECT COALESCE(SUM(km_final-km_inicial),0) FROM recorrido WHERE fin >= CURDATE() AND fin < CURDATE() + INTERVAL 1 DAY'),
             'buses_total'=>$this->numero('SELECT COUNT(*) FROM bus'),
             'buses_activos'=>$this->numero('SELECT COUNT(*) FROM bus WHERE activo=1'),
             'buses_asignados'=>$this->numero('SELECT COUNT(*) FROM bus WHERE activo=1 AND conductor_id IS NOT NULL'),

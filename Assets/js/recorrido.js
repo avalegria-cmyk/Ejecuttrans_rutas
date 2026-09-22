@@ -10,6 +10,55 @@ const resultados = document.getElementById('resultadosRutas');
 const estado = document.getElementById('estadoBusqueda');
 let solicitud, temporizador, version = 0, seleccion = -1, coincidencias = [];
 let guardando = false;
+let estadoApp = JSON.parse(document.getElementById('estadoInicialApp').textContent);
+let estadoPendiente = null;
+let canalApp = null;
+const conexionApp = document.getElementById('estadoConexionApp');
+
+function aplicarEstadoApp(nuevo) {
+    // El guardado confirma su resultado antes de actualizar los formularios.
+    if (guardando) { estadoPendiente = nuevo; return; }
+    if (JSON.stringify(nuevo.recorrido) !== JSON.stringify(estadoApp.recorrido)) {
+        iniciar.disabled = finalizar.disabled = true;
+        location.reload();
+        return;
+    }
+    const cambioBus = JSON.stringify(nuevo.bus) !== JSON.stringify(estadoApp.bus);
+    estadoApp = nuevo;
+    document.getElementById('discoAsignado').textContent = nuevo.bus ? 'Disco ' + nuevo.bus.disco : 'Sin unidad asignada';
+    document.getElementById('avisoAsignacion').hidden = Boolean(nuevo.bus || nuevo.recorrido);
+    iniciar.disabled = Boolean(nuevo.recorrido || !nuevo.bus);
+    finalizar.disabled = !nuevo.recorrido;
+    iniciar.querySelector('.modulo-detalle').textContent = nuevo.recorrido
+        ? 'Ya tienes una ruta en curso'
+        : nuevo.bus ? 'Seleccionar ruta y registrar salida' : 'Necesitas un bus asignado';
+    if (cambioBus && !nuevo.recorrido) {
+        // No conserva una salida preparada para una unidad que ya fue cambiada.
+        confirmacion.close(); dialogo.close(); form.reset();
+        if (buscar) {
+            rutaId.value = ''; buscar.setCustomValidity('');
+            cerrarOpciones();
+            estado.textContent = 'Se muestran hasta 5 coincidencias. Selecciona una ruta del listado.';
+        }
+        document.getElementById('nombreEvidencia').textContent = '';
+        document.getElementById('subirEvidencia').textContent = 'Subir evidencia';
+    }
+}
+function conectarEstadoApp() {
+    if (canalApp) return;
+    canalApp = new EventSource('/Controllers/ConductorStreamController.php');
+    canalApp.addEventListener('estado', evento => {
+        conexionApp.textContent = '';
+        aplicarEstadoApp(JSON.parse(evento.data));
+    });
+    canalApp.addEventListener('revocado', () => {
+        canalApp.close(); canalApp = null;
+        location.replace('/index.php');
+    });
+    canalApp.onerror = () => {
+        conexionApp.textContent = 'Reconectando… La asignación puede estar desactualizada.';
+    };
+}
 
 for (const modulo of [iniciar, finalizar]) {
     modulo.addEventListener('click', () => {
@@ -19,6 +68,7 @@ for (const modulo of [iniciar, finalizar]) {
 document.getElementById('cancelarConfirmacion').onclick = () => confirmacion.close();
 document.getElementById('aceptarConfirmacion').onclick = () => {
     confirmacion.close();
+    if (!estadoApp.recorrido && !estadoApp.bus) return;
     document.getElementById('mensaje').textContent = '';
     dialogo.showModal();
 };
@@ -66,7 +116,7 @@ async function buscarRutas() {
         const data = await response.json();
         if (!response.ok || data.status !== 'success') throw new Error(data.message || 'No se pudieron consultar las rutas.');
         if (actual !== version || !dialogo.open) return;
-        coincidencias = data.rutas;
+        coincidencias = data.rutas.slice(0,5);
         opciones.replaceChildren();
         coincidencias.forEach((ruta, i) => {
             const opcion = document.createElement('li');
@@ -135,6 +185,14 @@ form.onsubmit = async event => {
     const cancelar = document.getElementById('cancelar');
     const mensaje = document.getElementById('mensaje');
     const etiqueta = boton.textContent;
+    if (!estadoApp.recorrido && !estadoApp.bus) {
+        mensaje.textContent = 'No tienes un bus habilitado asignado. Contacta a secretaría.';
+        return;
+    }
+    if (estadoApp.recorrido && Number(form.elements.kilometraje.value) <= Number(estadoApp.recorrido.km_inicial)) {
+        mensaje.textContent = 'El kilometraje final debe ser mayor al inicial de este recorrido.';
+        form.elements.kilometraje.focus(); return;
+    }
     if (buscar && !rutaId.value) {
         buscar.setCustomValidity('Selecciona una ruta de las coincidencias.');
         buscar.reportValidity();
@@ -158,6 +216,10 @@ form.onsubmit = async event => {
         guardando = false;
         boton.disabled = cancelar.disabled = false;
         boton.textContent = etiqueta;
+        if (estadoPendiente) {
+            const nuevo = estadoPendiente; estadoPendiente = null;
+            aplicarEstadoApp(nuevo);
+        }
     }
 };
 window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });
@@ -177,3 +239,12 @@ evidencia.addEventListener('invalid', event => {
     document.getElementById('mensaje').textContent = 'Sube una foto o PDF como evidencia para continuar.';
     subirEvidencia.focus();
 });
+
+window.addEventListener('pagehide', () => {
+    canalApp?.close(); canalApp = null;
+});
+window.addEventListener('online', () => {
+    canalApp?.close(); canalApp = null;
+    conectarEstadoApp();
+});
+conectarEstadoApp();

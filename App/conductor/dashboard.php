@@ -2,10 +2,9 @@
 require_once __DIR__.'/../../Config/bootstrap.php';
 require_once __DIR__.'/../../Dao/RecorridoDao.php';
 $u = exigirAcceso(['admin', 'conductor']);
-$activo = (new RecorridoDao($conexion))->activo($u['id']);
-$s = $conexion->prepare('SELECT disco,placa FROM bus WHERE conductor_id=? AND activo=1');
-$s->execute([$u['id']]);
-$bus = $s->fetch();
+$estadoApp = (new RecorridoDao($conexion))->estadoConductor((int)$u['id']);
+$activo = $estadoApp['recorrido'];
+$bus = $estadoApp['bus'];
 $nombreCorto = explode(' ', trim($u['nombres']))[0];
 ?>
 <!doctype html>
@@ -36,7 +35,7 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
         <div>
             <h1>Hola, <?= e($nombreCorto) ?></h1>
             <p><?= date('d/m/Y') ?></p>
-            <span class="disco"><?= $bus ? 'Disco '.e($bus['disco']) : 'Sin unidad asignada' ?></span>
+            <span class="disco" id="discoAsignado" role="status" aria-live="polite"><?= $bus ? 'Disco '.e($bus['disco']) : 'Sin unidad asignada' ?></span>
         </div>
         <a href="perfil.php" class="perfil-link" title="Ver mi perfil" aria-label="Ver mi perfil"><svg><use href="#icono-perfil"/></svg></a>
     </header>
@@ -44,7 +43,7 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
         <button type="button" id="iniciarRuta" class="modulo modulo-inicio" <?= $activo || !$bus ? 'disabled' : '' ?>>
             <span class="modulo-icono"><svg><use href="#icono-ruta"/></svg></span>
             <span class="modulo-titulo">INICIAR RUTA</span>
-            <span class="modulo-detalle"><?= $activo ? 'Ya tienes una ruta en curso' : 'Seleccionar ruta y registrar salida' ?></span>
+            <span class="modulo-detalle"><?= $activo ? 'Ya tienes una ruta en curso' : ($bus ? 'Seleccionar ruta y registrar salida' : 'Necesitas un bus asignado') ?></span>
         </button>
         <button type="button" id="finalizarRuta" class="modulo modulo-fin" <?= !$activo ? 'disabled' : '' ?>>
             <span class="modulo-icono"><svg><use href="#icono-fin"/></svg></span>
@@ -54,9 +53,9 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
     </section>
     <?php if($activo): ?>
         <div class="estado-ruta" role="status"><span class="punto"></span><div><strong>En ruta · <?= e($activo['ruta_nombre']) ?></strong><p>Disco <?= e($activo['disco']) ?> · <?= number_format($activo['km_inicial'], 0, ',', '.') ?> km iniciales</p></div></div>
-    <?php elseif(!$bus): ?>
-        <p class="aviso">Solicita a secretaría que te asigne un bus habilitado para iniciar.</p>
     <?php endif ?>
+    <p class="aviso" id="avisoAsignacion" role="status" <?= $activo || $bus ? 'hidden' : '' ?>>Solicita a secretaría que te asigne un bus habilitado para iniciar.</p>
+    <p class="ayuda" id="estadoConexionApp" role="status" aria-live="polite"></p>
 </main>
 <dialog id="confirmacionRuta" class="confirmacion" aria-labelledby="tituloConfirmacion" aria-describedby="textoConfirmacion">
     <span class="confirmacion-icono"><svg><use href="<?= $activo ? '#icono-fin' : '#icono-ruta' ?>"/></svg></span>
@@ -97,6 +96,7 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
 </dialog>
 <script src="/Assets/js/common.js"></script>
 <script src="/Assets/js/comprimir_comprobante.js"></script>
-<script src="/Assets/js/recorrido.js?v=3" defer></script>
+<script id="estadoInicialApp" type="application/json"><?= json_encode($estadoApp,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script>
+<script src="/Assets/js/recorrido.js?v=4" defer></script>
 </body>
 </html>
