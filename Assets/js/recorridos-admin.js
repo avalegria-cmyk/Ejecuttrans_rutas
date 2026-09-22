@@ -17,9 +17,6 @@ function render(){
         const fecha=String(r.inicio).slice(0,10);
         return texto.includes(filtro) && (!estado || (estado==='activo'?!r.fin:!!r.fin)) && (!ruta || r.ruta_nombre===ruta) && (!disco || String(r.disco)===disco) && (!desde || fecha>=desde) && (!hasta || fecha<=hasta);
     });
-    document.getElementById('total').textContent=filas.length;
-    document.getElementById('activos').textContent=filas.filter(r=>!r.fin).length;
-    document.getElementById('kilometros').textContent=formato.format(filas.reduce((s,r)=>s+Number(r.distancia || 0),0));
     const cuerpo=document.getElementById('recorridos'); cuerpo.replaceChildren();
     const evidencia=(id,tipo)=>{ const a=document.createElement('a'); a.href=`/Controllers/EvidenciaController.php?id=${id}&tipo=${tipo}`;a.target='_blank';a.rel='noopener';a.textContent='Ver archivo ↗';return a;};
     for(const r of filas){

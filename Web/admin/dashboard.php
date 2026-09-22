@@ -1,11 +1,22 @@
 <?php
 require_once __DIR__.'/../../Config/bootstrap.php';
 require_once __DIR__.'/../../Config/vista.php';
-require_once __DIR__.'/../../Dao/RecorridoDao.php';
-$u=exigirAcceso(['admin','secretaria']); cabecera('Recorridos',$u,'dashboard');
+require_once __DIR__.'/../../Dao/DashboardDao.php';
+$u=exigirAcceso(['admin','secretaria']);
+$datos=(new DashboardDao($conexion))->obtener();
+cabecera('Dashboard',$u,'dashboard');
 ?>
-<div class="stats dashboard-stats"><div class="stat stat-blue"><span>RECORRIDOS VISIBLES</span><strong id="total">0</strong><small>Según los filtros aplicados</small></div><div class="stat stat-amber"><span>EN CURSO</span><strong id="activos">0</strong><small>Unidades operando ahora</small></div><div class="stat stat-green"><span>KILÓMETROS FINALIZADOS</span><strong id="kilometros">0</strong><small>Acumulado de recorridos visibles</small></div></div>
-<section class="panel dashboard-panel"><div class="toolbar filters dashboard-toolbar"><div><span class="profile-label">OPERACIÓN</span><h2>Registro de recorridos</h2><span class="live" id="conexion">Conectando…</span></div><div class="filter-controls recorridos-filters"><input id="filtro" class="filtro-recorrido" type="search" placeholder="Buscar conductor, disco o ruta…" aria-label="Buscar recorridos"><select id="estado" class="filtro-recorrido" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="activo">En curso</option><option value="finalizado">Finalizados</option></select><select id="ruta" class="filtro-recorrido" aria-label="Filtrar por ruta"><option value="">Todas las rutas</option></select><select id="disco" class="filtro-recorrido" aria-label="Filtrar por disco"><option value="">Todos los discos</option></select><input id="desde" class="filtro-recorrido" type="date" aria-label="Fecha inicial"><input id="hasta" class="filtro-recorrido" type="date" aria-label="Fecha final"><button type="button" class="secondary" id="limpiarFiltros">Limpiar filtros</button></div></div>
-<div class="table-scroll"><table><thead><tr><th>Conductor</th><th>Disco</th><th>Ruta</th><th>Inicio</th><th>Km inicial</th><th>Evidencia</th><th>Fin</th><th>Km final</th><th>Evidencia</th><th>Distancia</th><th>Estado</th></tr></thead><tbody id="recorridos"></tbody></table><div id="vacio" class="empty">Todavía no hay recorridos. Aparecerán aquí cuando un conductor inicie uno.</div></div><p class="hint">Últimos 500 registros · Fechas y horas de Ecuador · Las evidencias se abren en otra pestaña.</p></section>
-<script id="datosRecorridos" type="application/json"><?= json_encode((new RecorridoDao($conexion))->listar(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script><script src="/Assets/js/recorridos-admin.js" defer></script>
+<div class="overview-intro"><div><p class="eyebrow">RESUMEN GENERAL</p><h2>Así va la operación hoy</h2><p class="muted">Datos de <?= e(date('d/m/Y')) ?> · Hora de Ecuador</p></div><a class="button" href="/Web/admin/recorridos.php">Ver recorridos <span aria-hidden="true">→</span></a></div>
+<div class="overview-stats" aria-label="Indicadores de operación">
+  <article class="overview-card accent-blue"><span>Recorridos de hoy</span><strong><?= e($datos['recorridos_hoy']) ?></strong><small><?= e($datos['finalizados_hoy']) ?> finalizados</small></article>
+  <article class="overview-card accent-amber"><span>En curso ahora</span><strong><?= e($datos['en_curso']) ?></strong><small>Recorridos activos</small></article>
+  <article class="overview-card accent-green"><span>Kilómetros de hoy</span><strong><?= e(number_format($datos['km_hoy'],0,',','.')) ?></strong><small>De recorridos finalizados</small></article>
+  <article class="overview-card accent-violet"><span>Buses habilitados</span><strong><?= e($datos['buses_activos']) ?></strong><small><?= e($datos['buses_asignados']) ?> con conductor asignado</small></article>
+</div>
+<div class="overview-grid">
+  <section class="panel overview-activity"><div class="section-title"><div><span class="profile-label">ÚLTIMA ACTIVIDAD</span><h2>Recorridos recientes</h2></div><a href="/Web/admin/recorridos.php">Ver todos →</a></div>
+  <?php if($datos['recientes']): ?><div class="activity-list"><?php foreach($datos['recientes'] as $r): ?><div class="activity-item"><div class="activity-icon <?= $r['fin']?'done':'running' ?>" aria-hidden="true"><?= $r['fin']?'✓':'↗' ?></div><div><strong><?= e($r['conductor_nombre']) ?></strong><span>Disco <?= e($r['disco']) ?> · <?= e($r['ruta_nombre']) ?></span></div><div class="activity-meta"><span class="badge <?= $r['fin']?'green':'amber' ?>"><?= $r['fin']?'Finalizado':'En curso' ?></span><small><?= e(date('d/m H:i',strtotime($r['inicio']))) ?></small></div></div><?php endforeach ?></div>
+  <?php else: ?><p class="empty">Aún no hay recorridos registrados.</p><?php endif ?></section>
+  <div class="overview-side"><section class="panel"><div class="section-title"><div><span class="profile-label">CATÁLOGOS</span><h2>Estado del sistema</h2></div></div><div class="system-facts"><div><span>Buses registrados</span><strong><?= e($datos['buses_total']) ?></strong></div><div><span>Sin conductor</span><strong><?= e($datos['buses_sin_conductor']) ?></strong></div><div><span>Rutas habilitadas</span><strong><?= e($datos['rutas_activas']) ?></strong></div><?php if($u['rol']==='admin'): ?><div><span>Usuarios habilitados</span><strong><?= e($datos['usuarios_activos']) ?></strong></div><?php endif ?></div></section></div>
+</div>
 <?php pie(); ?>

@@ -56,18 +56,22 @@ try:
     token=admin.token('/Web/admin/usuarios.php')
     stoken=secretaria.token('/Web/admin/rutas.php')
     dtoken=driver.token('/App/conductor/dashboard.php')
-    for path in ['/Web/admin/usuarios.php','/Web/admin/buses.php','/Web/admin/rutas.php','/Web/admin/dashboard.php']:
+    for path in ['/Web/admin/usuarios.php','/Web/admin/buses.php','/Web/admin/rutas.php','/Web/admin/dashboard.php','/Web/admin/recorridos.php']:
         assert driver.get(path)[0]==403,path
         assert admin.get(path)[0]==200,path
     assert admin.get('/Web/admin/socios.php')[0]==404
     usuarios_html=admin.get('/Web/admin/usuarios.php')[1].decode()
     buses_html=admin.get('/Web/admin/buses.php')[1].decode()
     rutas_html=admin.get('/Web/admin/rutas.php')[1].decode()
-    recorridos_html=admin.get('/Web/admin/dashboard.php')[1].decode()
+    dashboard_html=admin.get('/Web/admin/dashboard.php')[1].decode()
+    recorridos_html=admin.get('/Web/admin/recorridos.php')[1].decode()
     assert 'id="filtroRol"' in usuarios_html and 'id="filtroEstado"' in usuarios_html
     assert 'id="filtroAsignacion"' in buses_html and 'socio_id' not in buses_html
     assert 'id="filtroEstado"' in rutas_html
     assert all(f'id="{campo}"' in recorridos_html for campo in ['estado','ruta','disco','desde','hasta'])
+    assert 'RECORRIDOS VISIBLES' not in recorridos_html and 'KILÓMETROS FINALIZADOS' not in recorridos_html
+    assert 'Así va la operación hoy' in dashboard_html and 'id="sidebarToggle"' in dashboard_html
+    assert '/Web/admin/recorridos.php' in dashboard_html
     assert '>Socios<' not in usuarios_html
     assert secretaria.get('/Web/admin/usuarios.php')[0]==403
     assert secretaria.get('/App/conductor/dashboard.php')[0]==403

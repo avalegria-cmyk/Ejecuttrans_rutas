@@ -6,30 +6,21 @@ Aplicación PHP 8.3, MySQL 8.4, JavaScript y Tailwind, organizada en MVC con DAO
 
 ```sh
 docker compose up -d --build
-docker compose exec web php scripts/crear_demo.php
 ```
 
 - Aplicación: http://localhost:8083
-- phpMyAdmin: http://localhost:8084 (servidor `db`, usuario `recorridos`, contraseña local `recorridos.local.2026`).
+- phpMyAdmin: http://localhost:8084 (servidor `db`, usuario `recorridos`; la contraseña se configura con `DB_PASSWORD`).
 - MySQL y evidencias persisten en los volúmenes de este proyecto: `sistema_recorridos_recorridos_db` y `sistema_recorridos_evidencias`.
 - Los contenedores y volúmenes del sistema anterior no se modifican.
 - Esta instalación se construyó aprovechando la imagen PHP 8.3.33 local con `docker compose build --build-arg PHP_BASE=sistema_minutos-web:latest web`. La construcción predeterminada usa la imagen oficial `php:8.3.33-apache`.
-- `database/schema.sql` se ejecuta al crear el volumen de MySQL por primera vez.
+- `database/schema.sql` se ejecuta al crear el volumen de MySQL por primera vez. La versión pública define las tablas y rutas de ejemplo, pero no publica usuarios ni buses reales.
 
-Las cuentas iniciales son `1710034065` (administrador), `0926687856` (secretaría) y `0102030400` (conductor). Cada contraseña es la misma cédula. `crear_demo.php` es idempotente y deja estas cuentas habilitadas sin reemplazar otras cuentas.
-
-| Rol | Cédula |
-| --- | --- |
-| Administrador | 1710034065 |
-| Secretaría | 0926687856 |
-| Conductor | 0102030400 |
-
-El script es idempotente y no reemplaza contraseñas existentes. Incluye el disco 001 asignado al conductor y dos rutas editables. Cambia las credenciales antes de usar datos reales. Las variables `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` se pueden definir en `.env` antes de inicializar la base.
+Si agregas datos reales a tu copia local de `schema.sql`, no publiques ese archivo: contendrá cédulas, nombres y hashes de contraseña. `scripts/crear_demo.php` queda disponible solo para pruebas opcionales y puede agregar cuentas y una unidad de demostración. Las variables `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD` se pueden definir en `.env` antes de inicializar la base.
 
 ## Uso y permisos
 
-- Administrador: recorridos, buses, rutas, usuarios y acceso a la vista de la app.
-- Secretaría: recorridos, buses y rutas. Sin acceso a usuarios, incluso mediante llamadas directas al controlador.
+- Administrador: dashboard, recorridos, buses, rutas, usuarios y acceso a la vista de la app.
+- Secretaría: dashboard, recorridos, buses y rutas. Sin acceso a usuarios, incluso mediante llamadas directas al controlador.
 - Conductor: perfil, contraseña e inicio/finalización de su recorrido. Sin acceso a administración.
 - Cada bus puede tener un conductor fijo y cada conductor un solo bus asignado.
 - En Buses se asigna o cambia el conductor. Un bus con recorrido activo no puede editarse. Para trasladar un conductor, retíralo primero del bus anterior.
@@ -37,7 +28,9 @@ El script es idempotente y no reemplaza contraseñas existentes. Incluye el disc
 
 La app conserva el menú de dos tarjetas del sistema de minutos, sin reloj. Para iniciar: confirmar la intención, buscar o seleccionar una ruta habilitada (AJAX, hasta 5 coincidencias), introducir kilometraje entero y adjuntar evidencia. Escribir filtra el catálogo; se debe seleccionar una coincidencia y no se crean rutas desde la app. Para finalizar: confirmar la intención e introducir kilometraje final y evidencia. Ambas tarjetas permanecen visibles: Iniciar ruta se deshabilita durante el recorrido y Finalizar ruta se habilita únicamente mientras existe un recorrido activo. Los botones dependen del estado persistido. La base también impide recorridos simultáneos para un mismo conductor o bus. El kilometraje final no puede ser menor al inicial; el nuevo inicial no puede ser menor al último final del bus.
 
-Las horas se registran en el servidor en UTC−5. Los nombres de conductor, ruta y disco se guardan en el recorrido para preservar el historial. Los módulos administrativos incluyen búsqueda y filtros combinables. Recorridos muestra los últimos 500 registros, permite filtrar por estado, ruta, disco y fechas, y recibe cambios con Server-Sent Events; reconecta automáticamente. Los contadores corresponden a los registros filtrados.
+Las horas se registran en el servidor en UTC−5. Los nombres de conductor, ruta y disco se guardan en el recorrido para preservar el historial. Los módulos administrativos incluyen búsqueda y filtros combinables. Recorridos muestra los últimos 500 registros, permite filtrar por estado, ruta, disco y fechas, y recibe cambios con Server-Sent Events; reconecta automáticamente.
+
+El Dashboard resume recorridos de hoy, viajes en curso, kilómetros finalizados hoy, buses, rutas y actividad reciente. El menú lateral se puede ocultar con el botón de hamburguesa; en móviles se abre como un panel superpuesto. La elección de escritorio se conserva en este navegador.
 
 Las evidencias aceptan JPG, PNG, WEBP o PDF de hasta 10 MB. Las imágenes se reducen a 1600 píxeles y se guardan como JPEG; los PDF se conservan. Los archivos se sirven exclusivamente desde un controlador con autorización. Las imágenes de más de 24 megapíxeles se rechazan en el servidor para limitar memoria.
 
