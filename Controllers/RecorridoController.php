@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Dao/RecorridoDao.php';
 require_once __DIR__.'/../Models/Recorrido.php';
 require_once __DIR__.'/../Models/Evidencia.php';

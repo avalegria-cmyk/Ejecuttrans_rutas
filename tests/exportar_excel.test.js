@@ -30,7 +30,7 @@ async function datosExportados(modulo) {
         querySelector: () => tabla,
     };
     vm.runInNewContext(script, {
-        document, FormData,
+        document, FormData, appUrl: ruta => '/'+ruta,
         fetch: async (_url, opciones) => {
             resultado = JSON.parse(opciones.body.get('datos'));
             throw new Error('Solicitud capturada para la prueba');

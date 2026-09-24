@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../../Config/bootstrap.php';
+require_once __DIR__.'/../../Config/inicio.php';
 require_once __DIR__.'/../../Dao/RecorridoDao.php';
 $u = exigirAcceso(['admin', 'conductor']);
 $estadoApp = (new RecorridoDao($conexion))->estadoConductor((int)$u['id']);
@@ -8,19 +8,18 @@ $bus = $estadoApp['bus'];
 $nombreCorto = explode(' ', trim($u['nombres']))[0];
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="es" data-app-base="<?= e(baseApp()) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#f3f4f6">
     <meta name="color-scheme" content="light">
     <title>Menú · Recorridos</title>
-    <link rel="icon" href="/Assets/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" href="/Assets/icons/icon-192x192.png">
-    <link rel="manifest" href="/manifest.json">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config={corePlugins:{preflight:false}};</script>
-    <link rel="stylesheet" href="/Assets/css/conductor.css?v=3">
+    <link rel="icon" href="<?= e(urlApp('Assets/icons/icon-192x192.png')) ?>">
+    <link rel="apple-touch-icon" href="<?= e(urlApp('Assets/icons/icon-192x192.png')) ?>">
+    <link rel="manifest" href="<?= e(urlApp('manifest.json')) ?>">
+    <link rel="stylesheet" href="<?= e(urlApp('Assets/css/tailwind.css')) ?>">
+    <link rel="stylesheet" href="<?= e(urlApp('Assets/css/conductor.css?v=3')) ?>">
 </head>
 <body>
 <svg class="iconos" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -30,7 +29,7 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
     <symbol id="icono-buscar" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
 </defs></svg>
 <main class="menu-app">
-    <?php if($u['rol']==='admin'): ?><a class="volver-admin" href="/Web/admin/dashboard.php">← Administración</a><?php endif ?>
+    <?php if($u['rol']==='admin'): ?><a class="volver-admin" href="<?= e(urlApp('Web/admin/dashboard.php')) ?>">← Administración</a><?php endif ?>
     <header class="perfil-card">
         <div>
             <h1>Hola, <?= e($nombreCorto) ?></h1>
@@ -94,9 +93,9 @@ $nombreCorto = explode(' ', trim($u['nombres']))[0];
     <div class="acciones"><button type="button" class="secundario" id="cancelar">Cancelar</button><button type="submit" id="enviar"><?= $activo ? 'Finalizar ruta' : 'Iniciar ruta' ?></button></div>
 </form>
 </dialog>
-<script src="/Assets/js/common.js"></script>
-<script src="/Assets/js/comprimir_comprobante.js"></script>
+<script src="<?= e(urlApp('Assets/js/common.js')) ?>"></script>
+<script src="<?= e(urlApp('Assets/js/comprimir_comprobante.js')) ?>"></script>
 <script id="estadoInicialApp" type="application/json"><?= json_encode($estadoApp,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script>
-<script src="/Assets/js/recorrido.js?v=4" defer></script>
+<script src="<?= e(urlApp('Assets/js/recorrido.js?v=4')) ?>" defer></script>
 </body>
 </html>

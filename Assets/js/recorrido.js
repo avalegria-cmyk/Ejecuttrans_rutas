@@ -46,14 +46,14 @@ function aplicarEstadoApp(nuevo) {
 }
 function conectarEstadoApp() {
     if (canalApp) return;
-    canalApp = new EventSource('/Controllers/ConductorStreamController.php');
+    canalApp = new EventSource(appUrl('Controllers/ConductorStreamController.php'));
     canalApp.addEventListener('estado', evento => {
         conexionApp.textContent = '';
         aplicarEstadoApp(JSON.parse(evento.data));
     });
     canalApp.addEventListener('revocado', () => {
         canalApp.close(); canalApp = null;
-        location.replace('/index.php');
+        location.replace(appUrl('index.php'));
     });
     canalApp.onerror = () => {
         conexionApp.textContent = 'Reconectando… La asignación puede estar desactualizada.';
@@ -112,7 +112,7 @@ async function buscarRutas() {
     cerrarOpciones();
     estado.textContent = 'Buscando rutas…';
     try {
-        const response = await fetch('/Controllers/RutaController.php?q=' + encodeURIComponent(buscar.value.trim()), {signal: solicitud.signal});
+        const response = await fetch(appUrl('Controllers/RutaController.php?q=' + encodeURIComponent(buscar.value.trim())), {signal: solicitud.signal});
         const data = await response.json();
         if (!response.ok || data.status !== 'success') throw new Error(data.message || 'No se pudieron consultar las rutas.');
         if (actual !== version || !dialogo.open) return;
@@ -206,7 +206,7 @@ form.onsubmit = async event => {
         const datos = new FormData(form), original = datos.get('evidencia');
         if (original.size > 10 * 1024 * 1024) throw new Error('La evidencia no puede superar 10 MB.');
         datos.set('evidencia', await comprimirComprobante(original));
-        await postForm('/Controllers/RecorridoController.php', datos);
+        await postForm('Controllers/RecorridoController.php', datos);
         // Bloquea ambos módulos hasta cargar el nuevo estado confirmado por el servidor.
         iniciar.disabled = finalizar.disabled = true;
         location.reload();

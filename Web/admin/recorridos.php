@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__.'/../../Config/bootstrap.php';
+require_once __DIR__.'/../../Config/inicio.php';
 require_once __DIR__.'/../../Config/vista.php';
 require_once __DIR__.'/../../Dao/RecorridoDao.php';
 $u=exigirAcceso(['admin','secretaria']); cabecera('Recorridos',$u,'recorridos');
 ?>
 <section class="panel dashboard-panel"><div class="toolbar filters dashboard-toolbar"><div><span class="profile-label">OPERACIÓN</span><h2>Registro de recorridos</h2><span class="live" id="conexion">Conectando…</span></div><div class="filter-controls recorridos-filters"><input id="filtro" class="filtro-recorrido" type="search" placeholder="Buscar conductor, disco o ruta…" aria-label="Buscar recorridos"><select id="estado" class="filtro-recorrido" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="activo">En curso</option><option value="finalizado">Finalizados</option></select><select id="ruta" class="filtro-recorrido" aria-label="Filtrar por ruta"><option value="">Todas las rutas</option></select><select id="disco" class="filtro-recorrido" aria-label="Filtrar por disco"><option value="">Todos los discos</option></select><input id="desde" class="filtro-recorrido" type="date" aria-label="Fecha inicial"><input id="hasta" class="filtro-recorrido" type="date" aria-label="Fecha final"><button type="button" class="secondary" id="limpiarFiltros">Limpiar filtros</button></div></div>
 <div class="table-scroll"><table><thead><tr><th>Conductor</th><th>Disco</th><th>Ruta</th><th>Inicio</th><th>Km inicial</th><th>Evidencia</th><th>Fin</th><th>Km final</th><th>Evidencia</th><th>Distancia</th><th>Estado</th></tr></thead><tbody id="recorridos"></tbody></table><div id="vacio" class="empty">Todavía no hay recorridos. Aparecerán aquí cuando un conductor inicie uno.</div></div><p class="hint">Últimos 500 registros · Fechas y horas de Ecuador · Las evidencias se abren en otra pestaña.</p></section>
-<script id="datosRecorridos" type="application/json"><?= json_encode((new RecorridoDao($conexion))->listar(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script><script src="/Assets/js/recorridos-admin.js" defer></script>
+<script id="datosRecorridos" type="application/json"><?= json_encode((new RecorridoDao($conexion))->listar(),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script><script src="<?= e(urlApp('Assets/js/recorridos-admin.js')) ?>" defer></script>
 <?php pie(); ?>

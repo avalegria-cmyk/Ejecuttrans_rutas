@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Config/validacion_cedula.php';
 require_once __DIR__.'/../Dao/CatalogoDao.php';
 $modulo=(string)($_POST['modulo'] ?? '');

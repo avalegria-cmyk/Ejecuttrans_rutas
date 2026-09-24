@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 $modulo=$_POST['modulo'] ?? '';
 if (!is_string($modulo) || !in_array($modulo,['dashboard','recorridos','buses','rutas','usuarios','perfil'],true)) {
     jsonResponse(['status'=>'error','message'=>'Módulo inválido.'],404);

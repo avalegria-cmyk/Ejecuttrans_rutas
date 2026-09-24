@@ -59,7 +59,7 @@
             formulario.set('csrf',boton.dataset.csrf);
             formulario.set('modulo',modulo);
             formulario.set('datos',JSON.stringify(datos));
-            const respuesta=await fetch('/Controllers/ExportarController.php',{method:'POST',body:formulario});
+            const respuesta=await fetch(appUrl('Controllers/ExportarController.php'),{method:'POST',body:formulario});
             if (!respuesta.ok || !respuesta.headers.get('Content-Type')?.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
                 const error=await respuesta.json().catch(()=>null);
                 throw new Error(error?.message || 'No se pudo generar el Excel. Intenta de nuevo.');

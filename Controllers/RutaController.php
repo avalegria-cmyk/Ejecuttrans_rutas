@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Dao/RutaDao.php';
 exigirAcceso(['admin', 'conductor'], true);
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

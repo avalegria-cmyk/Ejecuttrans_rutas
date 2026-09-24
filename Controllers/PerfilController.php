@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 $u=exigirAcceso(['admin','secretaria','conductor'],true); exigirPost();
 $actual=$_POST['actual'] ?? ''; $nueva=$_POST['nueva'] ?? ''; $confirmacion=$_POST['confirmacion'] ?? '';
 if (!is_string($actual) || !is_string($nueva) || $nueva!==$confirmacion || strlen($nueva)<8 || strlen($nueva)>72) jsonResponse(['status'=>'error','message'=>'La nueva contraseña debe coincidir y tener de 8 a 72 caracteres.'],422);

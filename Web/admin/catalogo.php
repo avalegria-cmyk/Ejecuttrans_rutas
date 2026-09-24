@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../../Config/bootstrap.php';
+require_once __DIR__.'/../../Config/inicio.php';
 require_once __DIR__.'/../../Config/vista.php';
 require_once __DIR__.'/../../Dao/CatalogoDao.php';
 if (!isset($modulo) || !isset(CatalogoDao::TABLAS[$modulo])) { http_response_code(404); exit; }
@@ -46,5 +46,5 @@ cabecera($titulos[$modulo],$u,$modulo);
 <div class="field"><label for="activo">Estado</label><select id="activo" name="activo"><option value="1">Habilitado</option><option value="0">Deshabilitado</option></select></div></div>
 <?php if($modulo==='usuarios'): ?><p class="hint">Usuario nuevo: si dejas la contraseña vacía, se usará su cédula. Al editar, dejarla vacía conserva la contraseña actual.</p><?php endif ?>
 <div id="mensaje" class="message" role="alert"></div><div class="actions"><button type="button" class="secondary" id="cancelar">Cancelar</button><button type="submit" id="guardar">Guardar cambios</button></div></form></dialog>
-<script id="datosCatalogo" type="application/json"><?= json_encode($filas,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script><script src="/Assets/js/catalogos.js" defer></script>
+<script id="datosCatalogo" type="application/json"><?= json_encode($filas,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script><script src="<?= e(urlApp('Assets/js/catalogos.js')) ?>" defer></script>
 <?php pie(); ?>

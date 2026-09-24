@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Dao/RecorridoDao.php';
 exigirAcceso(['admin','secretaria'],true);
 $usuarioId=(int)$_SESSION['usuario_id']; session_write_close();

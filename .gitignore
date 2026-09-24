@@ -4,3 +4,4 @@ storage/evidencias/*
 !storage/evidencias/.gitkeep
 __pycache__/
 *.pyc
+node_modules/

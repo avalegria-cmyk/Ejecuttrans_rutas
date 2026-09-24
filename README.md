@@ -35,7 +35,9 @@ El Dashboard resume recorridos de hoy, viajes en curso, kilómetros finalizados 
 
 Las evidencias aceptan JPG, PNG, WEBP o PDF de hasta 10 MB. Las imágenes se reducen a 1600 píxeles y se guardan como JPEG; los PDF se conservan. Los archivos se sirven exclusivamente desde un controlador con autorización. Las imágenes de más de 24 megapíxeles se rechazan en el servidor para limitar memoria.
 
-La app tiene manifest y service worker, pero necesita Internet para registrar recorridos. No almacena páginas autenticadas en caché. La instalación como PWA fuera de localhost requiere HTTPS. Tailwind usa CDN; las vistas internas incluyen además sus estilos locales.
+La app tiene manifest y service worker, pero necesita Internet para registrar recorridos. No almacena páginas autenticadas en caché. La instalación como PWA fuera de localhost requiere HTTPS. Los estilos de Tailwind se compilan en `Assets/css/tailwind.css`, que se entrega junto con el código; el servidor no necesita Node ni depender del CDN. Las vistas conservan sus estilos locales para componentes propios. Para regenerar Tailwind durante el desarrollo: `npm ci` y `npm run build:css`.
+
+La aplicación puede servirse desde la raíz del dominio o una subcarpeta: los enlaces internos, los recursos estáticos y las llamadas AJAX utilizan la ruta base detectada del sitio. En un hosting compartido que no use Docker, configura PHP 8.3+, MySQL 8.4+ y una base de datos vacía antes de importar `database/schema.sql`. La configuración de Apache incluida en Docker bloquea el acceso web a `Config/`, `Dao/`, `Models/`, `database/`, `scripts/`, `tests/` y `storage/`; aplica restricciones equivalentes en el host antes de publicar.
 
 ## Estructura
 

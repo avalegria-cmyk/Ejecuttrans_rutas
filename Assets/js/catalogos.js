@@ -70,7 +70,7 @@ form.onsubmit=async e=>{
         campoConductor.focus(); return;
     }
     const button=document.getElementById('guardar'); button.disabled=true; mensaje.textContent='';
-    try { await postForm('/Controllers/CatalogoController.php',new FormData(form)); location.reload(); }
+    try { await postForm('Controllers/CatalogoController.php',new FormData(form)); location.reload(); }
     catch(error){mensaje.textContent=error.message;} finally{button.disabled=false;}
 };
 
@@ -109,7 +109,7 @@ async function buscarConductores() {
     estadoConductores.textContent='Buscando conductores…';
     try {
         const parametros=new URLSearchParams({q:campoConductor.value.trim(),bus_id:form.elements.id.value || '0'});
-        const respuesta=await fetch('/Controllers/ConductoresController.php?'+parametros,{signal:solicitud.signal,headers:{Accept:'application/json'}});
+        const respuesta=await fetch(appUrl('Controllers/ConductoresController.php?'+parametros),{signal:solicitud.signal,headers:{Accept:'application/json'}});
         const datos=await respuesta.json();
         if (!respuesta.ok || datos.status!=='success') throw new Error(datos.message || 'No se pudo buscar conductores.');
         if (solicitud.signal.aborted || consultaConductor!==solicitud || !editor.open) return;

@@ -1,6 +1,6 @@
 <?php
 // index.php
-require_once __DIR__ . '/Config/bootstrap.php';
+require_once __DIR__ . '/Config/inicio.php';
 $actual = usuarioActual();
 if (!$actual) { $_SESSION = []; }
 else { $_SESSION['rol'] = $actual['rol']; }
@@ -40,7 +40,8 @@ if (isset($_SESSION['usuario_id'])) {
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="Assets/icons/icon-192x192.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="Assets/css/tailwind.css">
+    <link rel="stylesheet" href="Assets/css/login.css">
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 flex items-center justify-center h-screen">
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Models/Evidencia.php';
 $u=exigirAcceso(['admin','secretaria','conductor'],true);
 $s=$conexion->prepare('SELECT conductor_id,evidencia_inicial,evidencia_final FROM recorrido WHERE id=?'); $s->execute([(int)($_GET['id'] ?? 0)]); $r=$s->fetch();

@@ -1,4 +1,5 @@
 <?php
+// Inicialización de sesión, conexión y funciones compartidas.
 declare(strict_types=1);
 if (session_status() !== PHP_SESSION_ACTIVE) session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off']);
 require_once __DIR__ . '/conexion.php';
@@ -19,7 +20,7 @@ function exigirAcceso(array $roles, bool $api = false): array {
     $u = usuarioActual();
     if (!$u || !in_array($u['rol'], $roles, true)) {
         if ($api) jsonResponse(['status'=>'error', 'message'=>'Acceso denegado.'], $u ? 403 : 401);
-        if (!$u) { header('Location: /index.php'); exit; }
+        if (!$u) { header('Location: '.urlApp('index.php')); exit; }
         http_response_code(403); exit('Acceso denegado.');
     }
     return $u;

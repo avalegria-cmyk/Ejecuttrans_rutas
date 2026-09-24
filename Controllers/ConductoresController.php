@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Dao/CatalogoDao.php';
 exigirAcceso(['admin','secretaria'],true);
 if ($_SERVER['REQUEST_METHOD']!=='GET') jsonResponse(['status'=>'error','message'=>'Método no permitido.'],405);

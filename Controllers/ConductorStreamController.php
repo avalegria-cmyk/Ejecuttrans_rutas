@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../Config/bootstrap.php';
+require_once __DIR__.'/../Config/inicio.php';
 require_once __DIR__.'/../Dao/RecorridoDao.php';
 $usuario=exigirAcceso(['admin','conductor'],true);
 $usuarioId=(int)$usuario['id'];

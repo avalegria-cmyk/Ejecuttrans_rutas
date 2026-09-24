@@ -18,7 +18,7 @@ function render(){
         return texto.includes(filtro) && (!estado || (estado==='activo'?!r.fin:!!r.fin)) && (!ruta || r.ruta_nombre===ruta) && (!disco || String(r.disco)===disco) && (!desde || fecha>=desde) && (!hasta || fecha<=hasta);
     });
     const cuerpo=document.getElementById('recorridos'); cuerpo.replaceChildren();
-    const evidencia=(id,tipo)=>{ const a=document.createElement('a'); a.href=`/Controllers/EvidenciaController.php?id=${id}&tipo=${tipo}`;a.target='_blank';a.rel='noopener';a.textContent='Ver archivo ↗';return a;};
+    const evidencia=(id,tipo)=>{ const a=document.createElement('a'); a.href=appUrl(`Controllers/EvidenciaController.php?id=${id}&tipo=${tipo}`);a.target='_blank';a.rel='noopener';a.textContent='Ver archivo ↗';return a;};
     for(const r of filas){
         const fila=document.createElement('tr');
         const badge=document.createElement('span');badge.className=`badge ${r.fin?'green':'amber'}`;badge.textContent=r.fin?'Finalizado':'En curso';
@@ -30,8 +30,8 @@ function render(){
 document.querySelectorAll('.filtro-recorrido').forEach(control=>control.addEventListener(control.tagName==='SELECT'?'change':'input',render));
 document.getElementById('limpiarFiltros').onclick=()=>{document.querySelectorAll('.filtro-recorrido').forEach(control=>control.value='');render();};
 render();
-const stream=new EventSource('/Controllers/RecorridosStreamController.php');
+const stream=new EventSource(appUrl('Controllers/RecorridosStreamController.php'));
 stream.addEventListener('recorridos',e=>{recorridos=JSON.parse(e.data);render();document.getElementById('conexion').textContent='Actualización en vivo';});
 stream.onerror=()=>{document.getElementById('conexion').textContent='Reconectando… Los datos pueden estar desactualizados.';};
-stream.addEventListener('revocado',()=>{stream.close();location.href='/index.php';});
+stream.addEventListener('revocado',()=>{stream.close();location.href=appUrl('index.php');});
 window.addEventListener('pagehide',()=>stream.close());
